@@ -1,0 +1,81 @@
+# Esta es una configuración .gitignore recomendada para proyectos Unity
+
+# Archivos generados por Unity
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+
+# Carpeta temporal generada por Unity3D
+.vs/
+.vscode/
+.idea/
+.gradle/
+
+# Archivo de configuración de usuario de Unity
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+
+# Carpetas de Unity3D generadas automáticamente
+sysinfo.txt
+*.apk
+*.aab
+*.unitypackage
+*.app
+*.exe
+
+# Crashlytics generado por Unity
+crashlytics-build.properties
+
+# Carpetas específicas de plataforma
+.DS_Store*
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+[Tt]humbs.db
+[Dd]esktop.ini
+
+# Carpetas específicas de Visual Studio
+ExportedObj/
+.consulo/
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+
+# Carpetas específicas de Mono
+mono_crash.*
+
+# Carpetas específicas de Rider
+.idea/
+.idea/
+Assets/Plugins/Editor/JetBrains*
+
+# Carpetas específicas de Visual Studio Code
+.vscode/
