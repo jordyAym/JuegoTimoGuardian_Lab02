@@ -15,6 +15,11 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float smallScale = 5f;
     [SerializeField] private float scaleTransitionSpeed = 7.5f;
 
+    [Header("Límites de movimiento")]
+    [SerializeField] private bool useBoundaries = true;
+    [SerializeField] private float leftBoundary = -10f;
+    [SerializeField] private float rightBoundary = 10f;
+
     // Referencias a componentes
     private Rigidbody2D rb;
     private bool isGrounded;
@@ -22,6 +27,7 @@ public class PlayerController : MonoBehaviour
     private float currentScale;
     private SpriteRenderer spriteRenderer;
     private Animator animator;
+    private Camera mainCamera;
 
     private void Awake()
     {
@@ -29,6 +35,7 @@ public class PlayerController : MonoBehaviour
         spriteRenderer = GetComponent<SpriteRenderer>();
         animator = GetComponent<Animator>();
         currentScale = normalScale;
+        mainCamera = Camera.main;
     }
 
     private void Start()
@@ -61,6 +68,7 @@ public class PlayerController : MonoBehaviour
         HandleMovement();
         HandleJump();
         HandleScale();
+        EnforceBoundaries();
     }
 
     private void CheckGround()
@@ -101,9 +109,6 @@ public class PlayerController : MonoBehaviour
 
     private void HandleJump()
     {
-        // Al principio del método HandleJump
-        Debug.Log("Botón Jump presionado: " + Input.GetButtonDown("Jump"));
-        Debug.Log("isGrounded: " + isGrounded);
         // Salto con verificación de suelo
         if (Input.GetButtonDown("Jump") && isGrounded)
         {
@@ -115,9 +120,6 @@ public class PlayerController : MonoBehaviour
             {
                 animator.SetTrigger("Jump");
             }
-
-            // Opcional: Reproducir sonido de salto
-            // AudioSource.PlayClipAtPoint(jumpSound, transform.position);
 
             Debug.Log("¡Salto!");
         }
@@ -142,6 +144,45 @@ public class PlayerController : MonoBehaviour
         jumpForce = isSmall ? 15f : 14f;
     }
 
+    // Método para forzar el cambio de tamaño (utilizado por interruptores)
+    public void ForceChangeSize(bool small)
+    {
+        isSmall = small;
+        Debug.Log("Tamaño forzado: " + (isSmall ? "Pequeño" : "Normal"));
+    }
+
+    // Método para mantener al jugador dentro de los límites definidos
+    private void EnforceBoundaries()
+    {
+        if (!useBoundaries) return;
+
+        // Opción 1: Límites fijos configurados en el inspector
+        if (mainCamera == null)
+        {
+            // Límites absolutos
+            float clampedX = Mathf.Clamp(transform.position.x, leftBoundary, rightBoundary);
+            if (transform.position.x != clampedX)
+            {
+                transform.position = new Vector3(clampedX, transform.position.y, transform.position.z);
+                rb.velocity = new Vector2(0, rb.velocity.y); // Detener movimiento horizontal al tocar límite
+            }
+        }
+        else
+        {
+            // Opción 2: Límites relativos a la cámara
+            float cameraHalfWidth = mainCamera.orthographicSize * mainCamera.aspect;
+            float leftLimit = mainCamera.transform.position.x - cameraHalfWidth + 0.5f; // Margen de 0.5 unidades
+            float rightLimit = mainCamera.transform.position.x + cameraHalfWidth - 0.5f;
+
+            float clampedX = Mathf.Clamp(transform.position.x, leftLimit, rightLimit);
+            if (transform.position.x != clampedX)
+            {
+                transform.position = new Vector3(clampedX, transform.position.y, transform.position.z);
+                rb.velocity = new Vector2(0, rb.velocity.y); // Detener movimiento horizontal al tocar límite
+            }
+        }
+    }
+
     // Función auxiliar para verificar si un parámetro existe en el Animator
     private bool HasParameter(string paramName)
     {
@@ -162,6 +203,15 @@ public class PlayerController : MonoBehaviour
         {
             Gizmos.color = isGrounded ? Color.green : Color.red;
             Gizmos.DrawWireSphere(groundCheck.position, checkRadius);
+        }
+
+        if (useBoundaries)
+        {
+            Gizmos.color = Color.blue;
+            Gizmos.DrawLine(new Vector3(leftBoundary, transform.position.y - 2, 0),
+                          new Vector3(leftBoundary, transform.position.y + 2, 0));
+            Gizmos.DrawLine(new Vector3(rightBoundary, transform.position.y - 2, 0),
+                          new Vector3(rightBoundary, transform.position.y + 2, 0));
         }
     }
 }
